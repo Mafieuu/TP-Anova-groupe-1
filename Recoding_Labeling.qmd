@@ -1,0 +1,99 @@
+---
+title: "analyse exploratoire"
+format: html
+editor: visual
+---
+
+## chargement data
+
+```{r}
+
+data <- read.csv("data/matches.csv", stringsAsFactors = FALSE)
+
+# Affichage d'un aperçu
+
+head(data)
+nrow(data)
+```
+
+## Gestion des NA
+
+Comme notre objectif est simplement d'appliquer nos connaissances du cours, nous allons juste suprimmer les lignes ayant des NA
+
+```{r}
+data <- na.omit(data)
+head(data)
+print(nrow(data))
+
+```
+
+## \## Creation de variables et recodage
+- formation des groupes en fonction de la difference d'elo : on va dire que c'est de l'expertise domaine (...) en attendant on se sert des quintiles
+-   La variable OddDraw represente la cote (anticipation des resultats de march null) est compris entre 1.29 et 22.6 et une mediane autour de 3.4
+
+
+```{r}
+# --- -------------difference absolu de helo domicle vs exterieur
+
+data$EloDiff <- abs(data$HomeElo - data$AwayElo)
+
+# quantiles pour répartir en 4 groupes
+
+quantiles_diff <- quantile(data$EloDiff, probs = c(0, 0.25, 0.50,0.75, 1), na.rm = TRUE)
+
+# Recodage de la différence de Helo en variable qualitative
+data$EloDiffGroup <- cut(data$EloDiff, 
+                         breaks = quantiles_diff, 
+                         include.lowest = TRUE, 
+                         labels = c("Très Équilibré", "légère différence", "Différence Modérée", "Grande difference"))
+
+ # ----------------------------------
+data$TotalShots <- data$HomeShots + data$AwayShots
+
+
+
+quantiles_odddraw <- quantile(data$OddDraw, probs = c(0, 0.33, 0.66, 1), na.rm = TRUE)
+data$OddDraw <- cut(data$OddDraw, 
+                    breaks = quantiles_odddraw, 
+                    include.lowest = TRUE, 
+                    labels = c("nul probable", "equilibre", "nul improbable"))
+# delete des variables plus necessaire
+data$HomeShots <- NULL
+data$AwayShots <- NULL
+data$HomeElo   <- NULL
+data$AwayElo   <- NULL
+
+#--------------------------------------
+# Creation de la variable cible
+
+data$agressivite <- data$HomeYellow + data$AwayYellow +2.5*(data$HomeRed + data$AwayRed)
++ log(0.75*(data$HomeFouls+ data$AwayFouls))
+# rien ne justifie cette formule mis a part les bessoins du TP
+
+
+#--------------------------------
+
+
+# deplacement des colones
+library(dplyr)
+data  <- data%>%
+          select("Division","EloDiffGroup","OddDraw","agressivite",everything())
+
+
+
+```
+
+## Labelisation
+
+```{r}
+library(labelled)
+# A suivre ...
+
+```
+
+## Sauvegarde
+
+```{r}
+write.csv(data, "data/final_matches.csv", row.names = FALSE)
+
+```
