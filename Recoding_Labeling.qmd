@@ -28,9 +28,9 @@ print(nrow(data))
 ```
 
 ## \## Creation de variables et recodage
-- formation des groupes en fonction de la difference d'elo : on va dire que c'est de l'expertise domaine (...) en attendant on se sert des quintiles
--   La variable OddDraw represente la cote (anticipation des resultats de march null) est compris entre 1.29 et 22.6 et une mediane autour de 3.4
 
+-   formation des groupes en fonction de la difference d'elo : on va dire que c'est de l'expertise domaine (...) en attendant on se sert des quintiles
+-   La variable OddDraw represente la cote (anticipation des resultats de march null) est compris entre 1.29 et 22.6 et une mediane autour de 3.4
 
 ```{r}
 # --- -------------difference absolu de helo domicle vs exterieur
